@@ -1,0 +1,550 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+
+
+<style>
+body {
+  background-color: rgb(236, 236, 236);
+}
+#btnGrpGame {
+display: none;
+margin-top: 10px;
+}
+#btnGrpBingo {
+display: none;
+margin-top: 10px;
+}
+.form-check-input {
+  background-color: rgb(169, 169, 169);
+}
+.form-check-label {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+h1 {
+  transform: scale(1.2);
+  margin-bottom: 15px;
+}
+.header {
+  display: inline;
+  height: 40px;
+}
+h4 {
+  margin-bottom: 10px;
+}
+h5 {
+  margin-bottom: 5px;
+}
+.btn {
+  font-size: 150%;
+}
+ul {
+  padding: 3px;
+  list-style-type: none;
+}
+img {
+  max-height: 95%;
+  max-width: 95%;
+}
+.dispContainer {
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  height: 65vh; 
+  font-size:300% ; 
+  overflow: auto; 
+  font-weight: bold;
+}
+.dispRow {
+  margin-top: 10px;
+}
+
+.histCard {
+  height: 65vh;
+}
+.cardSpot {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 8px;
+  height: 125px;
+  width: 125px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1px;
+  overflow: hidden;
+  background-color: white;
+}
+.cardRow {
+  display: flex;
+  justify-content: center;
+}
+.cluesCard {
+  margin-top: 10px;
+  display: block;
+
+}
+.gameCard{
+  display: block;
+  padding: 20px 0;
+}
+img.cardImg {
+  max-height:120px;
+  max-width:120px;
+}
+.printBtn {
+  display: flex;
+  justify-content: center;
+}
+button.print {
+  background-color: rgb(174, 173, 173);
+  font-size: 22px;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px 15px;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- current issue: 
+  1 format bingo card sizes
+  2 add a button to exit game card creation mode.
+-->
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+
+<div class='d-flex flex-row-reverse'>
+  <button class='btn fs-6 btn-secondary btnCard' id='btnCard'>Create Game Card</button>
+  <div class="header"></div>
+</div>
+
+<h1 class='text-center noPrint'>Constellation Bingo</h1>
+<h3 class='text-center noPrint' id='directions'>Choose a game mode.</h3>
+
+<div class='row selectMode noPrint'>
+  <div class='col-2'></div>
+  <div class='col-3 text-center'>
+    <button class='btn btn-primary modeBtn' id='btnByName'>By Name</button>
+  </div>
+  <div class="col-2 text-center">
+    <button class="btn btn-secondary returnMain" id="returnMain">Main Menu</button>
+    <button class="btn btn-primary blankCard" id="btnBlank">Blank Card</button>
+  </div>
+  <div class='col-3 text-center'>
+    <button class='btn btn-primary modeBtn' id='btnByImage'>By Image</button>
+  </div>
+</div>
+<div class='row modeOptions'>
+  <div class='col-1'></div>
+  <div class="col-5 text-center">
+    <p class="pt-3 noPrint">Constellation names will be displayed.<br>Cards contain images.</p>
+    <i class='pb-3 familiesChecks'>This mode includes all constellation families.</i>
+  </div>
+  <div class="col-5 text-center">
+    <p class="pt-3 noPrint">Constellation images will be displayed.<br>Cards contain names.</p>
+    <b class='pb-3 familiesChecks' style="font-size: 1.2em">Choose which families to include:</b>
+    <div class='col-8 familiesChecks' style="margin-top: 10px;">
+      <div class='pr-3 form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' name='constellationFamily' value='0'>
+        <label class='form-check-label'>Perseus Family</label>
+      </div>
+      <div class='form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' name='constellationFamily' value='1'>
+        <label class='form-check-label'>Hercules Family</label>
+      </div>
+      <div class='form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' name='constellationFamily' value='2'>
+        <label class='form-check-label'>Ursa Major Family</label>
+      </div>
+      <div class='form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' name='constellationFamily' value='3'>
+        <label class='form-check-label'>Zodiac Family</label>
+      </div>
+      <div class='form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' name='constellationFamily' value='4'>
+        <label class='form-check-label'>Orion Family</label>
+      </div>
+      <div class='form-check-reverse form-switch' id='selectFamilies'>
+        <input class='form-check-input' type='checkbox' role='switch' name='constellationFamily' value='5'>
+        <label class='form-check-label'>Heavenly Waters Family</label>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class='btn-group text-center' id='btnGrpGame'>
+  <button class='btn btn-secondary'  id='btnNewGame'>New Game</button>
+  <button class='btn btn-success' id='btnBingo'>Bingo!</button>
+  <button class='btn btn-primary' id='btnNext'>Next</button>
+</div>
+
+<div class='btn-group text-center' id='btnGrpBingo'>
+  <button class='btn btn-secondary' id='btnNewGame2'>New Game</button>
+  <button class='btn btn-danger' id='btnNoBingo'>No Bingo...</button>
+</div>
+
+<div class='row dispRow'>
+  <div class='col-md-8  dispcard' id='dispcard'>
+    <div class='card text-uppercase text-center align-items-middle dispContainer' id='dispContainer'>
+    </div>
+  </div>
+  <div class='col-md-4'>
+    <div class='card histcard'  style='overflow:auto'>
+      <ul id='histcard' style='font-size:150%'></ul>
+    </div>
+  </div>
+</div>
+
+<div class="gameCard printBtn noPrint">
+  <button class="print" onclick="printPageArea('printableArea')">Print</button>
+</div>
+<div class="gameCard text-center" id="printableArea">
+<h1>Constellation Bingo Card</h1>  
+
+  <div class="cardRow">
+    <div class="cardSpot" id="aa">aa</div>
+    <div class="cardSpot" id="ab">ab</div>
+    <div class="cardSpot" id="ac">ac</div>
+    <div class="cardSpot" id="ad">ad</div>
+  </div>
+  <div class="cardRow">
+    <div class="cardSpot" id="ba">ba</div>
+    <div class="cardSpot" id="bb">bb</div>
+    <div class="cardSpot" id="bc">bc</div>
+    <div class="cardSpot" id="bd">bd</div>
+  </div>
+  <div class="cardRow">
+    <div class="cardSpot" id="ca">ca</div>
+    <div class="cardSpot" id="cb">cb</div>
+    <div class="cardSpot" id="cc">cc</div>
+    <div class="cardSpot" id="cd">cd</div>
+  </div>
+  <div class="cardRow">
+    <div class="cardSpot" id="da">da</div>
+    <div class="cardSpot" id="db">db</div>
+    <div class="cardSpot" id="dc">dc</div>
+    <div class="cardSpot" id="dd">dd</div>
+  </div>
+</div>
+
+<script>
+const conFams = [
+  ["Cassiopeia", "Cepheus", "Perseus", "Andromeda", "Cetus", "Pegasus", "Auriga", "Lacerta", "Triangulum"],
+  ["Hercules", "Aquila", "Lyra", "Sagitta", "Cygnus", "Vulpecula", "Sextans", "Hydra", "Corvus", "Crater", "Serpens", "Ophiuchus", "Scutum"],
+  ["Ursa Major", "Ursa Minor", "Draco", "Bootes", "Camelopardalis", "Canes Venatici", "Coma Berenices", "Corona Borealis", "Lynx", "Leo Minor"],
+  ["Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpius", "Sagittarius", "Capricornus", "Aquarius"],
+  ["Orion", "Lepus", "Canis Major", "Canis Minor", "Monoceros"],
+  ["Eridanus", "Delphinus", "Equuleus"],
+];
+
+let conList = [];
+
+$('.gameCard').attr('hidden', true);
+$('.card').attr('hidden', true);
+$('.returnMain').attr('hidden',true);
+$('.blankCard').attr('hidden',true);
+
+function printPageArea(areaID){
+    $(".noPrint").attr('hidden',true);
+        window.print();
+    $(".noPrint").attr('hidden',false);
+}
+
+let card = 0;
+let index = {
+  value: 0,
+  history: [],
+  getRand: function (min, max) {
+    var rand = Math.floor(Math.random()*(max-min))+min;
+    this.value = rand;
+  },
+  checkIfRepeat: function (rand) {
+    return this.history.includes(rand);
+  },
+  getUniqueRand: function (min, max) {
+    this.getRand (min, max);
+    while (this.checkIfRepeat(this.value)) {
+      this.getRand (min, max);
+    }
+    this.history.push(this.value);
+    return this.value;
+  }
+};
+
+let checkboxes = document.querySelectorAll("input[type=checkbox][name=constellationFamily]");
+let selectFamilies = [];
+
+checkboxes.forEach(function(checkbox) {
+  checkbox.addEventListener('change', function() {
+    selectFamilies =
+      Array.from(checkboxes) // Convert checkboxes to an array to use filter and map.
+      .filter(i => i.checked) // Use Array.filter to remove unchecked checkboxes.
+      .map(i => i.value) // Use Array.map to extract only the checkbox values from the array of objects.
+    })
+
+});
+
+document.getElementById('btnCard').addEventListener('click', function () {display.loadCardMaker();});
+document.getElementById('btnBlank').addEventListener('click', function () {display.option = 3; display.createGameCard();});
+document.getElementById('btnByName').addEventListener('click', function () {
+  display.option=1;
+  switch (card) {
+    case 0:
+      
+      conList = conFams.flat();
+      display.refresh();
+      display.showInGameBtns();
+      break;
+   case 1:
+      display.createGameCard ();
+  }   
+});
+document.getElementById('btnByImage').addEventListener('click', function () {
+  display.option=2;
+  switch (card) {
+    case 0:
+      for (let i in selectFamilies) {
+        display.popList(selectFamilies[i]);
+      }
+      display.showClues();
+      break;
+    case 1:
+      display.createGameCard ();
+  };
+});
+document.getElementById('btnNext').addEventListener('click', function () {display.refresh();});
+document.getElementById('btnBingo').addEventListener('click', function () {display.bingo();});
+document.getElementById('btnNewGame').addEventListener('click', function () {location.reload(); conList = []; display.init();});
+document.getElementById('returnMain').addEventListener('click', function () {location.reload(); conList = []; display.init();});
+document.getElementById('btnNoBingo').addEventListener('click', function () {
+  display.showInGameBtns();
+  document.getElementById("dispContainer").setAttribute("style", "display: flex; align-items: center; justify-content: center; height: 105%; font-size:300% ; overflow: auto; font-weight: bold");
+  //document.getElementById('btnNoBingo').style.display="none";
+  display.continueGame();
+});
+//$('#dispcard').textfill(); <!--line was included in earlier version, but not working in this version. maybe due to updated jQuery calls?-->
+
+let display = {
+  option: 0,
+  allClues: [],
+  init: function () {
+    index.history = [];
+    this.allClues = [];
+    card = 0;
+    index.value = 0;
+    document.getElementById("histcard").innerHTML ="";
+    document.getElementById("dispContainer").innerHTML =  '';
+
+    $(".gameCard").attr("hidden",true);
+    $('.returnMain').attr('hidden',true);
+    $('.blankCard').attr('hidden',true);
+    this.hideInGameBtns ();
+    this.showSettingBtns ();
+  },
+  hideInGameBtns: function () {
+    document.getElementById('btnGrpGame').style.display='none';
+  },
+  showBingoBtns: function () {
+    document.getElementById('btnGrpBingo').style.display='block';
+  },
+  hidecards: function () {
+    $(".card").attr("hidden",true);
+  },
+  loadCardMaker: function() {
+    card = 1;
+    display.hideInGameBtns ();
+    display.hidecards ();
+    $('.returnMain').attr('hidden',false);
+    $('.blankCard').attr('hidden',false);
+    $('.modeOptions').attr('hidden',true);
+    $('.btnCard').attr('hidden',true);
+    $('.modeOptions').attr('hidden',false);
+    $('.familiesChecks').attr('hidden',true);
+    document.getElementById("directions").innerHTML = "<h3>Choose the game mode to be played.</h3><h5>Cards will be randomly created using the constellations from <u>all families</u>.</h5>";
+  },
+  showInGameBtns: function () {
+    $('.inGame').attr('hidden', false);
+    document.getElementById("directions").innerHTML = "";
+    document.getElementById('btnGrpBingo').style.display='none';
+    document.getElementById('btnGrpGame').style.display='block';
+    $(".card").attr("hidden",false);
+    $(".gameCard").attr("hidden",true);
+    
+  },
+  hideSettingBtns: function () {
+    $('.selectMode').attr('hidden',true);
+    $('.modeOptions').attr('hidden',true);
+    $('.btnCard').attr('hidden',true);
+  },
+  showSettingBtns: function () {
+    $('.selectMode').attr('hidden',false);
+    $('.returnMain').attr('hidden',true);
+    $('.blankCard').attr('hidden',true);
+    $('.modeOptions').attr('hidden',false);
+    $('.btnCard').attr('hidden',false);
+  },
+  refresh: function () {
+      switch (this.option) {
+        case 1:
+          this.hideSettingBtns();
+          if (index.history.length < conList.length) {
+            var max = conList.length;
+            var indexRand = index.getUniqueRand(0,max);
+            this.allClues.push(conList[indexRand]);
+            this.dispList(2);
+            document.getElementById("dispContainer").innerHTML = conList[indexRand];
+          } else {
+            display.dispList(1);
+            document.getElementById("btnBingo").style.display = "none";
+            document.getElementById("btnNext").style.display = "none";
+            document.getElementById("dispContainer").innerHTML = "<h1><b>No more constellations.</b></h1>";
+
+          }
+            break;
+        case 2:
+          this.hideSettingBtns();
+          if (index.history.length < conList.length) {
+            var max = conList.length;
+            var indexRand = index.getUniqueRand(0,max);
+            this.allClues.push(conList[indexRand]);
+            this.dispList(2);
+            document.getElementById("dispContainer").innerHTML = '<img src="images/'+conList[indexRand]+'.jpg"></img>';
+          } else {
+            display.dispList(1);
+            document.getElementById("btnBingo").style.display = "none";
+            document.getElementById("btnNext").style.display = "none";
+            document.getElementById("dispContainer").innerHTML = "<h1><b>No more constellations.</b></h1>";
+          }
+      }
+  },
+  continueGame: function () {
+      switch (this.option) {
+        case 1:
+          this.hideSettingBtns();
+          if (index.history.length < conList.length) {
+            var max = conList.length;
+            var indexRand = index.getUniqueRand(0,max);
+            this.allClues.push(conList[indexRand]);
+            document.getElementById("dispContainer").innerHTML = conList[indexRand];
+          } else {
+            document.getElementById("btnBingo").style.display = "none";
+            document.getElementById("btnNext").style.display = "none";
+            document.getElementById("dispContainer").innerHTML = "<h1><b>No more constellations.</b></h1>";
+          }
+            break;
+        case 2:
+          this.hideSettingBtns();
+          if (index.history.length < conList.length) {
+            var max = conList.length;
+            var indexRand = index.getUniqueRand(0,max);
+            this.allClues.push(conList[indexRand]);
+            document.getElementById("dispContainer").innerHTML = '<img src="images/'+conList[indexRand]+'.jpg"></img>';
+          } else {
+            document.getElementById("btnBingo").style.display = "none";
+            document.getElementById("btnNext").style.display = "none";
+            document.getElementById("dispContainer").innerHTML = "<h1><b>No more constellations.</b></h1>";
+          }
+      }
+  },
+  popList: function (family) {
+      conList.push(conFams[family]);
+      conList = conList.flat();
+  },
+  bingo: function () {
+    this.hideInGameBtns();
+    this.dispList(1);
+    this.showBingoBtns();
+    document.getElementById("dispContainer").innerHTML = "<h1><b>Bingo!</b></h1>";
+    document.getElementById('btnNewGame2').addEventListener('click', function () {location.reload(); conList = []; display.init();});
+  },
+  dispList: function (offset) {
+    if (this.allClues.length > 1) {
+      var li = document.createElement("li");
+      var item = document.createTextNode(this.allClues[(this.allClues.length-offset)]);
+      li.appendChild(item);
+      document.getElementById("histcard").insertBefore(li, document.getElementById("histcard").firstChild);
+
+    }
+  },
+  showClues: function () {
+    $('.histcard').attr('hidden', true);
+    $('.inGame').attr('hidden',true);
+    $('.returnMain').attr('hidden', false);
+    $('.blankCard').attr('hidden',true);
+    $('.modeBtn').attr('hidden',true);
+    $('.modeOptions').attr('hidden',true);
+    $('.btnCard').attr('hidden', true);
+    if(selectFamilies.length>0){
+      document.getElementById("directions").innerHTML = "<h3>Clues</h3><h5>Fill in your blank card with these names.</h5><button class='btn fs-4 btn-primary' btn-sm id='btnBegin'>Begin Game</button><div style='display: flex; justify-content: center;'><div class='card w-75 cluescard'><div class='row'><div class='col-4' style='font-size:100%'><ul id='dispLeft'></ul></div><div class='col-4' style='font-size:100%'><ul id='dispCenter'></ul></div><div class='col-4' style='font-size:100%'><ul id='dispRight'></ul></div></div></div></div>";
+      for (let i in conList) {
+        if (i < conList.length/3) {
+          this.addToList(conList[i], "dispLeft");
+        } else if (i > 0.666*conList.length){
+          this.addToList(conList[i], "dispRight");
+        } else {
+          this.addToList(conList[i], "dispCenter");
+        }
+      }
+      document.getElementById('btnBegin').addEventListener('click', function () {display.hideClues();display.refresh();display.showInGameBtns();});
+    } else {
+      window.alert("You must select at least one family.");
+      location.reload(); conList = []; display.init();
+    }
+  },
+  hideClues: function () {
+    $('.dispContainer').innerHTML = "";
+    $('.histcard').attr('hidden', false);
+
+  },
+  addToList: function (addItem, locationId) {
+    const li = document.createElement("li");
+    let item = document.createTextNode(addItem);
+    li.appendChild(item);
+    document.getElementById(locationId).appendChild(li);
+  },
+  createGameCard: function () {
+    const letters = ["a","b","c","d"];
+    index.history = [];
+    let spot =" ";
+    for (let x in letters) {
+      for (let y in letters) {
+        conList = conFams.flat();
+        var spotRand = index.getUniqueRand(0,conList.length);
+        spot = letters[x].concat(letters[y]);
+        $(".gameCard").attr("hidden",false);
+        $(".cardSpot").attr("hidden",false);
+        console.log(this.option);
+        switch (this.option) {
+          case 1:
+            document.getElementById(spot).innerHTML = '<img class="cardImg" src="images/'+conList[spotRand]+'.jpg"></img>';
+            break;
+          case 2:
+            document.getElementById(spot).innerHTML = conList[spotRand];
+            break;
+          case 3:
+            console.log("blank card");
+          document.getElementById(spot).innerHTML = " ";
+        }
+      }
+    }
+  }
+};
+
+
+</script>
+
+</body>
+</html>
